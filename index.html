@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Для тебя ❤️</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Bad+Script&display=swap');
+        
+        body {
+            background: #000000;
+            font-family: 'Caveat', cursive;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Контейнер для плавающих фото */
+        .photo-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: auto;
+            z-index: 0;
+        }
+        
+        /* Стили для каждого фото */
+        .photo-bg .floating-photo {
+            position: absolute;
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #ff3366;
+            box-shadow: 0 0 25px rgba(255, 51, 102, 0.7);
+            opacity: 0.4;
+            animation: float 8s infinite ease-in-out;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+        
+        .photo-bg .floating-photo:hover {
+            opacity: 0.9;
+            transform: scale(1.1) translateY(-5px);
+            border-color: #ff99aa;
+            box-shadow: 0 0 35px rgba(255, 51, 102, 0.9);
+            z-index: 100;
+        }
+        
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(0) rotate(0deg) scale(1); 
+            }
+            50% { 
+                transform: translateY(-35px) rotate(5deg) scale(1.05); 
+            }
+        }
+        
+        /* Модальное окно для фото */
+        .photo-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+        }
+        
+        .photo-modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            max-width: 90vw;
+            max-height: 90vh;
+            position: relative;
+            animation: modalAppear 0.3s ease;
+        }
+        
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .modal-content img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 20px;
+            border: 3px solid #ff3366;
+            box-shadow: 0 0 50px rgba(255, 51, 102, 0.5);
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 51, 102, 0.3);
+        }
+        
+        .modal-close:hover {
+            transform: scale(1.2);
+            color: #ff3366;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        body.modal-open .container {
+            filter: blur(5px);
+            transition: filter 0.3s;
+        }
+        
+        .photo-bg .floating-photo:nth-child(1) { top: 5%; left: 3%; animation-delay: 0s; width: 120px; height: 120px; }
+        .photo-bg .floating-photo:nth-child(2) { top: 12%; left: 85%; animation-delay: 0.7s; width: 140px; height: 140px; }
+        .photo-bg .floating-photo:nth-child(3) { top: 22%; left: 12%; animation-delay: 1.3s; width: 110px; height: 110px; }
+        .photo-bg .floating-photo:nth-child(4) { top: 32%; left: 80%; animation-delay: 0.2s; width: 150px; height: 150px; }
+        .photo-bg .floating-photo:nth-child(5) { top: 42%; left: 8%; animation-delay: 1.8s; width: 125px; height: 125px; }
+        .photo-bg .floating-photo:nth-child(6) { top: 52%; left: 75%; animation-delay: 0.9s; width: 115px; height: 115px; }
+        .photo-bg .floating-photo:nth-child(7) { top: 62%; left: 18%; animation-delay: 2.1s; width: 135px; height: 135px; }
+        .photo-bg .floating-photo:nth-child(8) { top: 72%; left: 88%; animation-delay: 0.4s; width: 130px; height: 130px; }
+        .photo-bg .floating-photo:nth-child(9) { top: 82%; left: 5%; animation-delay: 1.1s; width: 145px; height: 145px; }
+        .photo-bg .floating-photo:nth-child(10) { top: 90%; left: 70%; animation-delay: 1.6s; width: 120px; height: 120px; }
+        .photo-bg .floating-photo:nth-child(11) { top: 8%; left: 45%; animation-delay: 2.4s; width: 130px; height: 130px; }
+        .photo-bg .floating-photo:nth-child(12) { top: 65%; left: 35%; animation-delay: 0.1s; width: 140px; height: 140px; }
+        .photo-bg .floating-photo:nth-child(13) { top: 38%; left: 55%; animation-delay: 1.9s; width: 125px; height: 125px; }
+        .photo-bg .floating-photo:nth-child(14) { top: 85%; left: 25%; animation-delay: 2.2s; width: 115px; height: 115px; }
+        .photo-bg .floating-photo:nth-child(15) { top: 18%; left: 65%; animation-delay: 0.6s; width: 150px; height: 150px; }
+        
+        .container {
+            background: rgba(20, 20, 20, 0.85);
+            backdrop-filter: blur(3px);
+            padding: 35px 45px;
+            border-radius: 25px;
+            box-shadow: 0 0 50px rgba(255, 51, 102, 0.4);
+            text-align: center;
+            max-width: 650px;
+            width: 650px;
+            position: relative;
+            z-index: 10;
+            border: 2px solid #ff3366;
+            transition: all 0.5s ease;
+        }
+        
+        .container.expanded {
+            max-width: 750px;
+            width: 750px;
+        }
+        
+        .code-input-wrapper {
+            margin: 20px 0;
+        }
+        
+        #codeInput {
+            padding: 18px;
+            font-size: 28px;
+            background: #333;
+            border: 2px solid #ff3366;
+            border-radius: 15px;
+            width: 320px;
+            color: white;
+            outline: none;
+            text-align: center;
+            font-family: 'Caveat', cursive;
+            caret-color: #ff3366;
+            font-weight: bold;
+        }
+        
+        #codeInput:focus {
+            box-shadow: 0 0 15px rgba(255, 51, 102, 0.5);
+        }
+        
+        #codeInput::placeholder {
+            color: #ff99aa;
+            opacity: 0.8;
+            font-family: 'Caveat', cursive;
+            font-size: 26px;
+        }
+        
+        .hint {
+            color: #ff99aa;
+            font-size: 22px;
+            margin: 15px 0 20px 0;
+            font-style: italic;
+            font-family: 'Caveat', cursive;
+        }
+        
+        button {
+            background: #ff3366;
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            border-radius: 30px;
+            font-size: 24px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: bold;
+            margin: 15px 0 10px 0;
+            font-family: 'Caveat', cursive;
+        }
+        
+        button:hover:not(:disabled) {
+            background: #ff5577;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 51, 102, 0.7);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .message {
+            animation: fadeIn 1s;
+            color: white;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .heart {
+            color: #ff3366;
+            font-size: 60px;
+            animation: beat 1s infinite;
+            margin: 5px 0 20px 0;
+        }
+        
+        @keyframes beat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); text-shadow: 0 0 30px #ff3366; }
+        }
+        
+        .stats {
+            text-align: left;
+            margin: 25px 0;
+            padding: 20px 25px;
+            background: rgba(26, 26, 26, 0.8);
+            border-radius: 18px;
+            border-left: 5px solid #ff3366;
+            backdrop-filter: blur(2px);
+        }
+        
+        .stat-item {
+            margin: 15px 0;
+            font-size: 26px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            font-family: 'Caveat', cursive;
+        }
+        
+        .stat-item span {
+            font-family: 'Caveat', cursive;
+        }
+        
+        .heart-rate {
+            color: #ff99aa;
+            font-weight: bold;
+            margin-left: 8px;
+            margin-right: 4px;
+            transition: 0.3s;
+            font-family: 'Caveat', cursive;
+            font-size: 28px;
+        }
+        
+        .heart-rate-unit {
+            color: #ff99aa;
+            font-family: 'Caveat', cursive;
+            font-size: 26px;
+        }
+        
+        .infinity {
+            color: #ff3366;
+            font-size: 36px;
+            margin-left: 10px;
+            animation: pulse 1.5s infinite;
+            display: inline-block;
+            font-family: 'Caveat', cursive;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.9; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .eternity {
+            color: #ff99aa;
+            margin-left: 8px;
+            font-style: italic;
+            border-bottom: 2px dashed #ff3366;
+            font-family: 'Caveat', cursive;
+            font-size: 28px;
+        }
+        
+        .love-letter {
+            text-align: left;
+            margin: 25px 0;
+            padding: 25px 30px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            border: 2px solid #ff3366;
+            min-height: 200px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: all 0.5s ease;
+            font-family: 'Caveat', cursive;
+            font-size: 26px;
+        }
+        
+        .love-letter.expanded {
+            min-height: 500px;
+        }
+        
+        .love-line {
+            color: #fff;
+            line-height: 1.6;
+            font-size: 26px;
+            transition: all 0.5s ease;
+            text-align: center;
+            position: absolute;
+            width: calc(100% - 60px);
+            opacity: 0;
+            transform: translateY(30px);
+            pointer-events: none;
+            font-family: 'Caveat', cursive;
+        }
+        
+        .love-line.active {
+            opacity: 1;
+            transform: translateY(0);
+            position: relative;
+            width: 100%;
+        }
+        
+        .love-line.final-active {
+            opacity: 1;
+            transform: translateY(0);
+            position: relative;
+            width: 100%;
+            margin: 12px 0;
+            font-family: 'Caveat', cursive;
+        }
+        
+        .final-message {
+            color: #ff99aa !important;
+            font-size: 30px !important;
+            font-weight: bold;
+            text-align: center;
+            font-family: 'Caveat', cursive !important;
+        }
+        
+        .all-lines {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .all-lines .love-line {
+            position: relative;
+            opacity: 1;
+            transform: translateY(0);
+            width: 100%;
+            margin: 8px 0;
+            text-align: left;
+            padding-left: 15px;
+            border-left: 3px solid #ff3366;
+            font-family: 'Caveat', cursive;
+        }
+        
+        .message h1 {
+            color: #ff3366;
+            font-size: 34px;
+            margin: 10px 0 20px 0;
+            text-shadow: 0 0 15px rgba(255, 51, 102, 0.5);
+            line-height: 1.3;
+            font-family: 'Bad Script', cursive;
+        }
+        
+        .signature {
+            margin: 25px 0 10px 0;
+            color: #ff99aa;
+            font-style: italic;
+            font-size: 30px;
+            border-top: 2px solid #333;
+            padding-top: 18px;
+            font-family: 'Caveat', cursive;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0 15px 0;
+        }
+        
+        .nav-btn {
+            background: transparent;
+            border: 2px solid #ff3366;
+            color: #ff3366;
+            padding: 10px 30px;
+            margin: 0 5px;
+            font-family: 'Caveat', cursive;
+            font-size: 24px;
+            border-radius: 30px;
+        }
+        
+        .nav-btn:hover:not(:disabled) {
+            background: #ff3366;
+            color: white;
+        }
+        
+        .reset-btn {
+            background: #ff3366;
+            color: white;
+            margin: 20px 0 10px 0;
+            font-family: 'Caveat', cursive;
+            font-size: 26px;
+        }
+        
+        .reset-btn:hover {
+            background: #ff5577;
+        }
+        
+        #error {
+            color: #ff6b6b;
+            margin-top: 15px;
+            font-family: 'Caveat', cursive;
+            font-size: 22px;
+        }
+        
+        .progress {
+            color: #ff99aa;
+            font-size: 22px;
+            margin-top: 15px;
+            opacity: 0.8;
+            font-family: 'Caveat', cursive;
+        }
+    </style>
+</head>
+<body>
+    <!-- Модальное окно для фото -->
+    <div class="photo-modal" id="photoModal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <img id="modalImage" src="" alt="Увеличенное фото">
+        </div>
+    </div>
+
+    <div class="photo-bg" id="photoContainer"></div>
+
+    <div class="container" id="loginBox">
+        <div class="heart">❤️</div>
+        <h2 style="color: white; font-family: 'Caveat', cursive; font-size: 32px; margin: 10px 0;">🔐 Введи секретный код</h2>
+        <div class="code-input-wrapper">
+            <input type="text" id="codeInput" maxlength="10" placeholder="__ . __ . ____">
+        </div>
+        <div class="hint">ПОДСКАЗКА - ДАТА КОГДА Я ПОНЯЛ ЧТО БОЛЬШЕ НЕ НАМЕРЕН ТЕБЯ ТЕРЯТЬ</div>
+        <button onclick="checkCode()">Открыть</button>
+        <p id="error" style="display: none;">Неверный код. Попробуй ещё :)</p>
+    </div>
+
+    <div class="container message hidden" id="messageBox">
+        <div class="heart">❤️</div>
+        <h1>Той, ради которой бьется моё сердце!</h1>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <span style="margin-right: 15px;">❤️</span>
+                <span>Частота сердцебиения когда тебя вижу:</span>
+                <span class="heart-rate" id="heartRate">120</span>
+                <span class="heart-rate-unit">уд/мин</span>
+            </div>
+            <div class="stat-item">
+                <span style="margin-right: 15px;">💭</span>
+                <span>Мыслей о тебе в день:</span>
+                <span class="infinity">∞</span>
+            </div>
+            <div class="stat-item">
+                <span style="margin-right: 15px;">📅</span>
+                <span>Как долго я готов тебя любить:</span>
+                <span class="eternity">Вечность</span>
+            </div>
+        </div>
+        
+        <div class="love-letter" id="loveLetter">
+            <div id="line1" class="love-line">Мне не хватает слов, чтобы описать, как сильно ты мне нужна.</div>
+            <div id="line2" class="love-line">Ты в моей голове 24/7, и я даже не хочу чистить этот кэш.</div>
+            <div id="line3" class="love-line">Ты — моя зависимость, от которой не хочется лечиться.</div>
+            <div id="line4" class="love-line">Ты — моя тишина и мой шторм одновременно.</div>
+            <div id="line5" class="love-line">Ты видишь меня разным. И остаёшься.</div>
+            <div id="line6" class="love-line">Рядом с тобой я могу быть настоящим. И не бояться этого.</div>
+            <div id="line7" class="love-line final-message">Спасибо тебе. Ты стала не просто частью моей жизни, ты — и есть моя жизнь.</div>
+        </div>
+        
+        <div class="nav-buttons" id="navButtons">
+            <button class="nav-btn" id="prevBtn" onclick="prevLine()" disabled>← Назад</button>
+            <button class="nav-btn" id="nextBtn" onclick="nextLine()">Далее →</button>
+        </div>
+        
+        <div class="progress" id="progress">1 / 7</div>
+        
+        <div id="signature" class="signature hidden">Твой Пупсик Владик</div>
+        
+        <button class="reset-btn hidden" id="resetBtn" onclick="resetToFirstLine()">Ещё раз ❤️</button>
+    </div>
+
+    <script>
+        let currentLine = 0;
+        const totalLines = 7;
+        let heartRateInterval;
+        
+        // Функция для открытия фото на весь экран
+        function openPhotoModal(imgSrc) {
+            const modal = document.getElementById('photoModal');
+            const modalImg = document.getElementById('modalImage');
+            modalImg.src = imgSrc;
+            modal.classList.add('active');
+            document.body.classList.add('modal-open');
+        }
+        
+        // Функция для закрытия модального окна
+        function closeModal() {
+            const modal = document.getElementById('photoModal');
+            modal.classList.remove('active');
+            document.body.classList.remove('modal-open');
+        }
+        
+        // Закрытие по клавише ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+        
+        function loadPhotos() {
+            const photoContainer = document.getElementById('photoContainer');
+            
+            // ⬇️⬇️⬇️ ТЕПЕРЬ ФОТО В ФОРМАТЕ .png ⬇️⬇️⬇️
+            const photos = [
+                'photo1.png',  // Первое фото
+                'photo2.png',  // Второе фото
+                'photo3.png',  // Третье фото
+                'photo4.png',  // Четвертое фото
+                'photo5.png',  // Пятое фото
+                'photo6.png',  // Шестое фото
+                'photo7.png',  // Седьмое фото
+                'photo8.png',  // Восьмое фото
+                'photo9.png',  // Девятое фото
+                'photo10.png', // Десятое фото
+                'photo11.png', // Одиннадцатое фото
+                'photo12.png', // Двенадцатое фото
+                'photo13.png', // Тринадцатое фото
+                'photo14.png', // Четырнадцатое фото
+                'photo15.png'  // Пятнадцатое фото
+            ];
+            // ⬆️⬆️⬆️ ЗДЕСЬ ⬆️⬆️⬆️
+            
+            for (let i = 0; i < 15; i++) {
+                const img = document.createElement('img');
+                img.className = 'floating-photo';
+                img.src = photos[i % photos.length];
+                img.alt = 'Наше фото ' + (i + 1);
+                
+                // Добавляем обработчик клика для открытия на весь экран
+                img.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    openPhotoModal(this.src);
+                });
+                
+                photoContainer.appendChild(img);
+            }
+        }
+        
+        document.getElementById('codeInput').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^\d]/g, '');
+            if (value.length > 8) value = value.slice(0, 8);
+            
+            let formatted = '';
+            if (value.length > 0) {
+                if (value.length <= 2) formatted = value;
+                else if (value.length <= 4) formatted = value.slice(0, 2) + '.' + value.slice(2);
+                else formatted = value.slice(0, 2) + '.' + value.slice(2, 4) + '.' + value.slice(4, 8);
+            }
+            e.target.value = formatted;
+        });
+        
+        function getRandomHeartRate() {
+            return Math.floor(Math.random() * 6) + 120;
+        }
+        
+        function updateHeartRate() {
+            const heartRateElement = document.getElementById('heartRate');
+            if (heartRateElement) heartRateElement.textContent = getRandomHeartRate();
+        }
+        
+        function showLine(lineNumber) {
+            const loveLetter = document.getElementById('loveLetter');
+            const container = document.getElementById('messageBox').parentElement;
+            
+            loveLetter.classList.remove('expanded');
+            container.classList.remove('expanded');
+            
+            for (let i = 1; i <= totalLines; i++) {
+                document.getElementById('line' + i).classList.remove('active', 'final-active');
+            }
+            
+            if (lineNumber <= totalLines) {
+                document.getElementById('line' + lineNumber).classList.add('active');
+                currentLine = lineNumber;
+                
+                document.getElementById('prevBtn').disabled = (currentLine <= 1);
+                document.getElementById('nextBtn').disabled = false;
+                document.getElementById('progress').textContent = currentLine + ' / ' + totalLines;
+                
+                document.getElementById('signature').classList.add('hidden');
+                document.getElementById('resetBtn').classList.add('hidden');
+                document.getElementById('navButtons').classList.remove('hidden');
+                document.getElementById('progress').classList.remove('hidden');
+            }
+        }
+        
+        function showAllLines() {
+            const loveLetter = document.getElementById('loveLetter');
+            const container = document.getElementById('messageBox').parentElement;
+            
+            loveLetter.classList.add('expanded');
+            container.classList.add('expanded');
+            
+            for (let i = 1; i <= totalLines; i++) {
+                const line = document.getElementById('line' + i);
+                line.classList.remove('active');
+                line.classList.add('final-active');
+            }
+            
+            loveLetter.classList.add('all-lines');
+            document.getElementById('navButtons').classList.add('hidden');
+            document.getElementById('progress').classList.add('hidden');
+            document.getElementById('signature').classList.remove('hidden');
+            document.getElementById('resetBtn').classList.remove('hidden');
+        }
+        
+        function nextLine() {
+            if (currentLine < totalLines) showLine(currentLine + 1);
+            else if (currentLine === totalLines) showAllLines();
+        }
+        
+        function prevLine() {
+            if (currentLine > 1) showLine(currentLine - 1);
+        }
+        
+        function resetToFirstLine() {
+            const loveLetter = document.getElementById('loveLetter');
+            const container = document.getElementById('messageBox').parentElement;
+            loveLetter.classList.remove('expanded', 'all-lines');
+            container.classList.remove('expanded');
+            showLine(1);
+        }
+        
+        function checkCode() {
+            const code = document.getElementById('codeInput').value;
+            const digitsOnly = code.replace(/\./g, '');
+            if (digitsOnly === '11032025') {
+                document.getElementById('loginBox').classList.add('hidden');
+                document.getElementById('messageBox').classList.remove('hidden');
+                
+                if (heartRateInterval) clearInterval(heartRateInterval);
+                heartRateInterval = setInterval(updateHeartRate, 500);
+                
+                showLine(1);
+            } else {
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+
+        function resetPage() {
+            document.getElementById('loginBox').classList.remove('hidden');
+            document.getElementById('messageBox').classList.add('hidden');
+            document.getElementById('codeInput').value = '';
+            document.getElementById('error').style.display = 'none';
+            
+            if (heartRateInterval) clearInterval(heartRateInterval);
+            
+            const loveLetter = document.getElementById('loveLetter');
+            const container = document.getElementById('messageBox').parentElement;
+            loveLetter.classList.remove('expanded', 'all-lines');
+            container.classList.remove('expanded');
+        }
+        
+        window.onload = function() {
+            loadPhotos();
+        };
+    </script>
+</body>
+</html>
