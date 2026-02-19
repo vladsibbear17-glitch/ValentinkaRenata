@@ -65,6 +65,13 @@
             z-index: 5;
         }
         
+        /* Когда окно свернуто - фото становятся ярче */
+        body.minimized-mode .photo-bg .floating-photo {
+            opacity: 0.9;
+            border-color: #ff99aa;
+            box-shadow: 0 0 30px rgba(255, 51, 102, 0.9);
+        }
+        
         @keyframes float {
             0%, 100% { 
                 transform: translateY(0) rotate(0deg) scale(1); 
@@ -98,12 +105,13 @@
         }
         
         body.modal-open .container-wrapper,
-        body.modal-open .toggle-btn {
+        body.modal-open .toggle-btn,
+        body.modal-open .hint-btn {
             filter: blur(3px);
             pointer-events: none;
         }
         
-        /* Кнопка-сердечко в левом нижнем углу */
+        /* Кнопка-сердечко для сворачивания/разворачивания */
         .toggle-btn {
             position: fixed;
             bottom: 20px;
@@ -142,6 +150,73 @@
             100% { transform: scale(1); }
         }
         
+        /* Новая кнопка справа снизу с разбитым сердечком */
+        .hint-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 70px;
+            height: 70px;
+            background: #1a1a1a;
+            border: 3px solid #888;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: #aaa;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            line-height: 1;
+        }
+        
+        .hint-btn:hover {
+            border-color: #ff3366;
+            color: #ff99aa;
+            background: #2a2a2a;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 51, 102, 0.3);
+        }
+        
+        /* Подсказка для кнопки */
+        .hint-message {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 3px solid #ff3366;
+            border-radius: 20px;
+            padding: 15px 25px;
+            color: #ff99aa;
+            font-family: 'Caveat', cursive;
+            font-size: 24px;
+            font-weight: bold;
+            z-index: 250;
+            max-width: 300px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(255, 51, 102, 0.5);
+            animation: slideIn 0.3s ease;
+            pointer-events: none;
+            backdrop-filter: blur(5px);
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .hint-message.hidden {
+            display: none;
+        }
+        
         /* Обертка для контейнера с текстом */
         .container-wrapper {
             position: relative;
@@ -165,7 +240,7 @@
             pointer-events: none;
         }
         
-        /* УМЕНЬШЕННОЕ ОКНО - ТОЛЬКО ОДИН СКРОЛБАР ЗДЕСЬ */
+        /* УМЕНЬШЕННОЕ ОКНО */
         .container {
             background: rgba(20, 20, 20, 0.9);
             backdrop-filter: blur(5px);
@@ -185,7 +260,7 @@
             overflow-y: auto;
         }
         
-        /* Стили для вертикального скролбара - только для всего окна */
+        /* Стили для вертикального скролбара */
         .container::-webkit-scrollbar {
             width: 4px;
             background: transparent;
@@ -343,7 +418,6 @@
             justify-content: center;
             transition: all 0.5s ease;
             font-size: 20px;
-            /* УБИРАЕМ СКРОЛБАР ИЗ ЭТОГО БЛОКА */
             overflow: visible;
         }
         
@@ -352,7 +426,6 @@
             max-height: none;
         }
         
-        /* Удаляем все стили скролбара для love-letter */
         .love-letter::-webkit-scrollbar {
             display: none;
         }
@@ -567,12 +640,32 @@
             .love-line {
                 font-size: 18px;
             }
+            
+            .hint-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 35px;
+            }
+            
+            .hint-message {
+                font-size: 20px;
+                padding: 12px 20px;
+                bottom: 90px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Кнопка-сердечко в левом нижнем углу -->
+    <!-- Кнопка-сердечко для сворачивания/разворачивания -->
     <button class="toggle-btn" id="toggleBtn" onclick="toggleContainer()">❤️</button>
+    
+    <!-- Новая кнопка с разбитым сердечком -->
+    <button class="hint-btn" id="hintBtn" onclick="showHint()">💔</button>
+    
+    <!-- Подсказка -->
+    <div class="hint-message hidden" id="hintMessage">
+        наша первая встреча на остановке
+    </div>
 
     <!-- Модальное окно для фото -->
     <div class="photo-modal" id="photoModal" onclick="closeModal()">
@@ -682,6 +775,24 @@
             if (!messageWrapper.classList.contains('hidden')) {
                 messageWrapper.classList.toggle('minimized');
             }
+            
+            // Добавляем или убираем класс для body, чтобы управлять яркостью фото
+            if (loginWrapper.classList.contains('minimized') || messageWrapper.classList.contains('minimized')) {
+                document.body.classList.add('minimized-mode');
+            } else {
+                document.body.classList.remove('minimized-mode');
+            }
+        }
+        
+        // Функция для показа подсказки
+        function showHint() {
+            const hintMessage = document.getElementById('hintMessage');
+            hintMessage.classList.remove('hidden');
+            
+            // Автоматически скрываем через 5 секунд
+            setTimeout(() => {
+                hintMessage.classList.add('hidden');
+            }, 5000);
         }
         
         function loadPhotos() {
@@ -830,6 +941,7 @@
             
             document.getElementById('loginWrapper').classList.remove('minimized');
             document.getElementById('messageWrapper').classList.remove('minimized');
+            document.body.classList.remove('minimized-mode');
         }
         
         window.onload = function() {
@@ -838,4 +950,3 @@
     </script>
 </body>
 </html>
-
